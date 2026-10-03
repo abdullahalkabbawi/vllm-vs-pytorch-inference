@@ -1,0 +1,28 @@
+{
+  "tag": "vllm",
+  "config": {
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "dtype": "float16",
+    "input_len": 512,
+    "output_len": 256,
+    "num_prompts": 64,
+    "latency_runs": 5,
+    "tag": "vllm",
+    "enforce_eager": false,
+    "gpu_mem": 0.9
+  },
+  "latency": {
+    "ttft_ms": 52.566921105608344,
+    "tpot_ms": 15.616065717539659,
+    "e2e_s": 4.034663679078221,
+    "single_stream_tok_per_s": 63.45014612432008
+  },
+  "throughput": [
+    {
+      "mode": "continuous batching",
+      "total_s": 8.07971593295224,
+      "output_tok_per_s": 2027.7940630535838,
+      "requests_per_s": 7.921070558803062
+    }
+  ]
+}

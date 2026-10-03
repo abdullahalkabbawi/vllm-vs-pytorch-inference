@@ -44,7 +44,7 @@ def panel(ax, labels, values, colors, title, unit):
     ax.set_facecolor(SURFACE)
     bars = ax.bar(labels, values, color=colors, width=0.6, edgecolor=SURFACE, linewidth=2)
     for b, v in zip(bars, values):
-        ax.annotate(f"{v:,.0f}" if v >= 10 else f"{v:.1f}", (b.get_x() + b.get_width() / 2, v),
+        ax.annotate(f"{v:,.0f}" if v >= 100 else f"{v:.1f}", (b.get_x() + b.get_width() / 2, v),
                     xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", color=INK)
     ax.set_title(title, loc="left", fontsize=11, fontweight="bold")
     ax.set_ylabel(unit)

@@ -8,6 +8,37 @@ Same model, same prompts, same number of generated tokens. Two engines:
 | `vllm` | vLLM with all its tricks: PagedAttention, continuous batching, CUDA graphs |
 | `vllm-eager` | vLLM with CUDA graphs off (`--enforce-eager`), to show how much CUDA graphs alone add |
 
+## Results: RTX 4090 (24 GB), Qwen2.5-7B-Instruct fp16, vLLM 0.30.0
+
+512 prompt tokens, 256 output tokens, 64 requests.
+
+![comparison](results/comparison.png)
+
+| Run | Throughput (tok/s) | TTFT (ms) | Time per token (ms) | One request, end to end (s) |
+|---|---:|---:|---:|---:|
+| HF eager, batch 1 | 47 | 52.5 | 20.9 | 5.39 |
+| HF eager, batch 8 | 347 | | | |
+| HF eager, batch 16 | 644 | | | |
+| vLLM, CUDA graphs off | 1,996 | 50.4 | 15.9 | 4.11 |
+| **vLLM** | **2,028** | 52.6 | **15.6** | **4.03** |
+
+**What the numbers say**
+- **Throughput: vLLM is 3.2x the best HF run and 43x HF at batch size 1.** Generating a token means reading all
+  15 GB of weights from GPU memory, whether you serve 1 request or 64. vLLM's paged KV cache had room for ~99
+  requests of this size, so it ran all 64 together and paid that cost once per step for all of them.
+- **Time per token: 15.6 ms vs 20.9 ms (1.3x).** The 4090 moves ~1 TB/s, so reading 15.2 GB of weights takes at least
+  ~15 ms. vLLM is at ~97% of that hardware limit. HF loses ~5 ms per token to Python overhead in `generate()` and unfused kernels.
+- **Time to first token: ~52 ms for all three.** Processing a 512-token prompt is limited by raw compute
+  (~7.8 trillion math operations), and every engine runs into the same limit. No software trick helps much here.
+- **CUDA graphs barely mattered (15.6 vs 15.9 ms).** Each decode step takes ~15 ms on the GPU, so the CPU has plenty of time
+  to launch the next kernels. CUDA graphs pay off with smaller models or faster GPUs, where steps are short enough for launch overhead to show.
+
+**Caveats (things to try next)**
+- HF was only tested up to batch 16. Running `python -u bench_hf.py --batch-sizes 32,64 --tag hf-eager-big` would
+  show how much of the gap is just batch size.
+- Every request here has the same length. That is the *best case* for static batching. With real chat traffic,
+  where outputs vary in length, HF waits for the longest request in each batch while vLLM refills free slots right away, so the gap would grow.
+
 ## What gets measured
 
 **Latency** (one request on its own, median of 5 runs)
