@@ -1,0 +1,2 @@
+vllm            # pulls in a matching torch + transformers
+matplotlib
