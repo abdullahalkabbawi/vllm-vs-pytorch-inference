@@ -13,9 +13,7 @@ def main():
     args = p.parse_args()
 
     tok = AutoTokenizer.from_pretrained(args.model)
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model, torch_dtype=getattr(torch, args.dtype), device_map="cuda"
-    ).eval()
+    model = AutoModelForCausalLM.from_pretrained(args.model, dtype=getattr(torch, args.dtype)).to("cuda").eval()
     pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
 
     def generate(batch, n_tokens):
