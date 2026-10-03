@@ -3,7 +3,7 @@
 set -e
 cd "$(dirname "$0")"
 
-python bench_hf.py "$@"
-python bench_vllm.py "$@"
-python bench_vllm.py --enforce-eager "$@"
-python compare.py
+python -u bench_hf.py "$@"
+python -u bench_vllm.py "$@"
+python -u bench_vllm.py --enforce-eager "$@"
+python -u compare.py
