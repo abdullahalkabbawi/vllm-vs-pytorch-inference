@@ -1,0 +1,39 @@
+{
+  "tag": "hf-eager",
+  "config": {
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "dtype": "float16",
+    "input_len": 512,
+    "output_len": 256,
+    "num_prompts": 64,
+    "latency_runs": 5,
+    "tag": "hf-eager",
+    "batch_sizes": "1,8,16"
+  },
+  "latency": {
+    "ttft_ms": 52.46355989947915,
+    "tpot_ms": 20.93202900415396,
+    "e2e_s": 5.390130955958739,
+    "single_stream_tok_per_s": 47.494207857231075
+  },
+  "throughput": [
+    {
+      "mode": "static batch 1",
+      "total_s": 346.86844211257994,
+      "output_tok_per_s": 47.23404614214629,
+      "requests_per_s": 0.18450799274275895
+    },
+    {
+      "mode": "static batch 8",
+      "total_s": 47.257490523857996,
+      "output_tok_per_s": 346.69636111398086,
+      "requests_per_s": 1.3542826606014877
+    },
+    {
+      "mode": "static batch 16",
+      "total_s": 25.460734264925122,
+      "output_tok_per_s": 643.500687353338,
+      "requests_per_s": 2.5136745599739765
+    }
+  ]
+}
